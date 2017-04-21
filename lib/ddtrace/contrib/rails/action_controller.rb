@@ -23,7 +23,9 @@ module Datadog
         def self.start_processing(*)
           return if Thread.current[KEY]
 
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           service = ::Rails.configuration.datadog_trace.fetch(:default_service)
           type = Datadog::Ext::HTTP::TYPE
           tracer.trace('rails.request', service: service, span_type: type)
@@ -37,7 +39,9 @@ module Datadog
           return unless Thread.current[KEY]
           Thread.current[KEY] = false
 
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           span = tracer.active_span()
           return unless span
 

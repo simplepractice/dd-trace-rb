@@ -18,7 +18,9 @@ module Datadog
         end
 
         def self.sql(_name, start, finish, _id, payload)
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           database_service = ::Rails.configuration.datadog_trace.fetch(:default_database_service)
           adapter_name = ::ActiveRecord::Base.connection_config[:adapter]
           adapter_name = Datadog::Contrib::Rails::Utils.normalize_vendor(adapter_name)

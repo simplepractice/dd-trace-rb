@@ -38,7 +38,9 @@ module Datadog
           key = get_key('render_template')
           return if Thread.current[key]
 
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           type = Datadog::Ext::HTTP::TEMPLATE
           tracer.trace('rails.render_template', span_type: type)
 
@@ -51,7 +53,9 @@ module Datadog
           key = get_key('render_partial')
           return if Thread.current[key]
 
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           type = Datadog::Ext::HTTP::TEMPLATE
           tracer.trace('rails.render_partial', span_type: type)
 
@@ -66,7 +70,9 @@ module Datadog
           Thread.current[key] = false
 
           # finish the tracing and update the execution time
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           span = tracer.active_span()
           return unless span
 
@@ -95,7 +101,9 @@ module Datadog
           Thread.current[key] = false
 
           # finish the tracing and update the execution time
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           span = tracer.active_span()
           return unless span
 

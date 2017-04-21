@@ -63,14 +63,20 @@ module Datadog
           # alone. And in some cases they are nested. In all cases we want to have one
           # and only one span.
           return if Thread.current[key]
-          create_span(::Rails.configuration.datadog_trace.fetch(:tracer))
+
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
+          create_span(tracer)
           Thread.current[key] = true
         rescue StandardError => e
           Datadog::Tracer.log.error(e.message)
         end
 
         def self.trace_cache(resource, _name, start, finish, _id, payload)
-          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer)
+          tracer = ::Rails.configuration.datadog_trace.fetch(:tracer, nil)
+          return if tracer.nil?
+
           key = get_key(resource)
           if Thread.current[key]
             # span was created by start_trace_cache, plan to re-use this one
